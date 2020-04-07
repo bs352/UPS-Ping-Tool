@@ -29,29 +29,24 @@ namespace UPSPingTool
             if (Regex.IsMatch(ip, pattern))
             {
                 textBox1.Text = ip;
-                //_targetIP = ip;
                 StartMonitoring();
-            }
-            else
-            {
-                // 
             }
         }
 
         public void StartMonitoring()
         {
-            // TODO...
             ResetStats();
             timer1.Enabled = true;
             button1.Text = "Stop Monitoring";
             toolStripStatusLabel1.Text = "Monitoring: " + _targetIP;
             textBox1.Enabled = false;
             _monitoring = true;
+
+            LogMessageToFile("Monitoring Started");
         }
                
         public void StopMonitoring()
         {
-            // TODO...
             timer1.Enabled = false;
             ResetStats();
             button1.Text = "Start Monitoring";
@@ -59,6 +54,8 @@ namespace UPSPingTool
             toolStripStatusLabel2.Text = "OK";
             textBox1.Enabled = true;
             _monitoring = false;
+
+            LogMessageToFile("Monitoring Stopped");
         }
 
         public void SaveConfig()
@@ -123,6 +120,7 @@ namespace UPSPingTool
                 if (_noReplyPings > 12)
                 {
                     // 60 seconds of no reply, we will commence Shutdown
+                    LogMessageToFile("Initiated Shutdown");
                     Process.Start("shutdown", "/s /t 0");
                 }
             }
@@ -135,6 +133,21 @@ namespace UPSPingTool
         {
             _noReplyPings = 0;
             toolStripStatusLabel2.Text = "OK";
+        }
+
+        private void LogMessageToFile(string msg)
+        {
+            System.IO.StreamWriter sw = System.IO.File.AppendText("UPS_Ping_Tool.log");
+            try
+            {
+                string logLine = System.String.Format(
+                    "{0:G}: {1}.", System.DateTime.Now, msg);
+                sw.WriteLine(logLine);
+            }
+            finally
+            {
+                sw.Close();
+            }
         }
     }
 }
