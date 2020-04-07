@@ -95,21 +95,28 @@ namespace UPSPingTool
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Ping pingSender = new Ping();
-            PingOptions options = new PingOptions();
-            options.DontFragment = true;
-
-            // Create a buffer of 32 bytes of data to be transmitted.
-            string data = "UPS Monitoring Service PING DATA";
-            byte[] buffer = Encoding.ASCII.GetBytes (data);
-            int timeout = 1000;
-            PingReply reply = pingSender.Send (_targetIP, timeout, buffer, options);
-            if (reply.Status != IPStatus.Success)
+            try
             {
-                _noReplyPings++;
-            }
+                Ping pingSender = new Ping();
+                PingOptions options = new PingOptions();
+                options.DontFragment = true;
 
-            UpdateStats();
+                // Create a buffer of 32 bytes of data to be transmitted.
+                string data = "UPS Monitoring Service PING DATA";
+                byte[] buffer = Encoding.ASCII.GetBytes(data);
+                int timeout = 1000;
+                PingReply reply = pingSender.Send(_targetIP, timeout, buffer, options);
+                if (reply.Status != IPStatus.Success)
+                {
+                    _noReplyPings++;
+                }
+
+                UpdateStats();
+            }
+            catch (Exception)
+            {
+                toolStripStatusLabel2.Text = "Error pinging Target";
+            }
         }
         public void UpdateStats()
         {
